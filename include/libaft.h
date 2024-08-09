@@ -1,6 +1,7 @@
 #ifndef LIBAFT_H
 #define LIBAFT_H
 
+#include <stdarg.h>
 #include <stddef.h>
 
 typedef struct s_list
@@ -68,5 +69,9 @@ void	ft_lstadd_front(t_list **lst, t_list *new);
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
+
+int ft_dprintf(int fd, const char *format, ...);
+int ft_printf(const char *format, ...);
+int ft_vdprintf(int fd, const char *format, va_list args);
 
 #endif
