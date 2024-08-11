@@ -1,23 +1,28 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-static size_t	write_string(int fd, const char *s)
+static int write_character(int fd, int c)
 {
-	size_t	written;
+	return (write(fd, &c, 1));
+}
+
+static int write_string(int fd, char *s)
+{
+	int written;
 
 	written = 0;
 	if (s == NULL)
 		s = "(null)";
 	while (*s)
-		written += write(fd, s++, 1);
+		written += write_character(fd, *s++);
 	return (written);
 }
 
-static size_t	write_number(int fd, ssize_t n, const int b, const char *bs)
+static int write_number(int fd, ssize_t n, const int b, const char *bs)
 {
-	size_t	i;
-	size_t	written;
-	char	buffer[65];
+	int	 i;
+	int	 written;
+	char buffer[65];
 
 	i = 0;
 	written = 0;
@@ -41,61 +46,53 @@ static size_t	write_number(int fd, ssize_t n, const int b, const char *bs)
 	return (written);
 }
 
-static size_t	write_memory(int fd, size_t m)
+static int write_address(int fd, void *a)
 {
-	size_t	written;
+	int written;
 
 	written = 0;
-	if (m == 0)
-		written += write_string(fd, "(nil)");
-	else
-	{
-		written += write_string(fd, "0x");
-		written += write_number(fd, m, 16, "0123456789abcdef");
-	}
+	if (a == NULL)
+		return (write_string(fd, "(nil)"));
+	written += write_string(fd, "0x");
+	written += write_number(fd, (size_t)a, 16, "0123456789abcdef");
 	return (written);
 }
 
-static size_t	write_format(int fd, const int f, va_list args)
-{
-	char	c;
+// ---
 
-	if (f == 'c')
-	{
-		c = va_arg(args, int);
-		return (write(fd, &c, 1));
-	}
-	if (f == 's')
-		return (write_string(fd, va_arg(args, const char *)));
-	if (f == 'd' || f == 'i')
-		return (write_number(fd, va_arg(args, int), 10, "0123456789"));
-	if (f == 'u')
-		return (write_number(fd, va_arg(args, size_t), 10, "0123456789"));
-	if (f == 'x')
-		return (write_number(fd, va_arg(args, size_t), 16, "0123456789abcdef"));
-	if (f == 'X')
-		return (write_number(fd, va_arg(args, size_t), 16, "0123456789ABCDEF"));
-	if (f == 'p')
-		return (write_memory(fd, (size_t)va_arg(args, void *)));
-	if (f == '%')
-		return (write(fd, "%", 1));
+static int write_type(int fd, int type, va_list ap)
+{
+	if (type == 'c')
+		return (write_character(fd, va_arg(ap, int)));
+	if (type == 's')
+		return (write_string(fd, va_arg(ap, char *)));
+	if (type == 'd' || type == 'i')
+		return (write_number(fd, va_arg(ap, int), 10, "0123456789"));
+	if (type == 'u')
+		return (write_number(fd, va_arg(ap, size_t), 10, "0123456789"));
+	if (type == 'x')
+		return (write_number(fd, va_arg(ap, size_t), 16, "0123456789abcdef"));
+	if (type == 'X')
+		return (write_number(fd, va_arg(ap, size_t), 16, "0123456789ABCDEF"));
+	if (type == 'p')
+		return (write_address(fd, va_arg(ap, void *)));
+	if (type == '%')
+		return (write_character(fd, '%'));
 	return (0);
 }
 
-int	ft_vdprintf(int fd, const char *format, va_list args)
+int ft_vdprintf(int fd, const char *format, va_list ap)
 {
-	const char	*p;
-	size_t		written;
+	int written;
 
-	p = format;
 	written = 0;
-	while (*p)
+	while (*format)
 	{
-		if (*p == '%' && *(p + 1))
-			written += write_format(fd, *(++p), args);
+		if (*format == '%' && *(format + 1))
+			written += write_type(fd, *(++format), ap);
 		else
-			written += write(fd, p, 1);
-		p++;
+			written += write_character(fd, *format);
+		format++;
 	}
 	return (written);
 }

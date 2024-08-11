@@ -2,11 +2,11 @@
 
 int	ft_dprintf(int fd, const char *format, ...)
 {
-	size_t	written;
-	va_list	args;
+	int		written;
+	va_list	ap;
 
-	va_start(args, format);
-	written = ft_vdprintf(fd, format, args);
-	va_end(args);
+	va_start(ap, format);
+	written = ft_vdprintf(fd, format, ap);
+	va_end(ap);
 	return (written);
 }

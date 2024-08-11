@@ -41,9 +41,18 @@ void *ft_memmove(void *dst, const void *src, size_t n);
 void *ft_memset(void *s, int c, size_t n);
 
 void ft_putchar_fd(char c, int fd);
-void ft_putendl_fd(char *s, int fd);
-void ft_putnbr_fd(int n, int fd);
+void ft_putchar(char c);
 void ft_putstr_fd(char *s, int fd);
+void ft_putstr(char *s);
+void ft_putendl_fd(char *s, int fd);
+void ft_putendl(char *s);
+void ft_putnbr_fd(int n, int fd);
+void ft_putnbr(int n);
+
+int ft_vdprintf(int fd, const char *format, va_list ap);
+int ft_dprintf(int fd, const char *format, ...);
+int ft_vprintf(const char *format, va_list ap);
+int ft_printf(const char *format, ...);
 
 char  *ft_strchr(const char *s, int c);
 char  *ft_strdup(const char *s);
@@ -69,9 +78,5 @@ void	ft_lstadd_front(t_list **lst, t_list *new);
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
-
-int ft_dprintf(int fd, const char *format, ...);
-int ft_printf(const char *format, ...);
-int ft_vdprintf(int fd, const char *format, va_list args);
 
 #endif
